@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  padding: 45px;
+  background-color: #42b3f4;
+}
+
+.loginTitleH1 {
+  padding: 45px;
+}
+
+.loginFormCol {
+  text-align: center;
+  margin: auto;
+}
+
+input[type=text],
+input[type=password] {
+    width: 25%;
+    padding: 12px 20px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.submitBtn {
+    display: block;
+    margin: auto;
+    text-align: center;
+}
