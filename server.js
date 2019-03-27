@@ -2,47 +2,51 @@
 // The Entire App is coded in this single file, instead of creating a seperate
 // file for each type (Routes / Passport / Database / Etc ) to make it easily readable for you!
 
-var express = require('express');
-var app = express();
-var passport = require('passport'),
-  LocalStrategy = require('passport-local').Strategy;
-var flash = require('connect-flash');
-var path = require('path');
-var session = require('express-session');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const passport = require('passport'),LocalStrategy = require('passport-local').Strategy;
+const flash = require('connect-flash');
+const path = require('path');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 // Path To HTML, CSS Folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cookieParser());
+
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
+
+// Set up Session Middleware
 app.use(session({
   "secret": "thisisasecret",
   "saveUninitialized": true,
   "resave": true
 }));
+
+// Initialize Passport and use Middleware
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
 
-// The User Details is currently saved here since my MySql experience is less.
-// Use the following usernames and pass to login from browser!
+// The User Details is currently saved here. Add your DB Connections to get users data (Keep reading below for more details).
+// Use any of the following usernames and password to login from browser!
 var usersData = [{
-    "userName": "Nik",
-    "pass": "nikil"
+    "userName": "Batman",
+    "pass": "batman"
   },
   {
-    "userName": "Vimal",
-    "pass": "vimal"
+    "userName": "Joker",
+    "pass": "joker"
   },
   {
-    "userName": "Rajesh",
-    "pass": "rajesh"
+    "userName": "Bane",
+    "pass": "bane"
   }
 ];
 
@@ -68,44 +72,42 @@ app.get('/success', (req, res) => {
 });
 
 passport.use(new LocalStrategy(
-  function(username, password, done) {
+  (username, password, done) => {
     // Going through the UsersData Array to see if Matching User and Pass is Available.
     var userFound = false;
-    for (var i = 0; i < usersData.length; i++) {
-      var usr = usersData[i];
+    // ES6 High-Order Method
+    usersData.forEach((usr) => {
       if (usr.userName === username) {
         userFound = true;
         console.log("User Found");
         if (usr.pass === password) {
           console.log("Password Approved");
-          passport.serializeUser(function(usr, done) {
+          passport.serializeUser((usr, done) => {
             done(null, usr.userName);
             console.log("User Serialized For Session");
           });
 
-          passport.deserializeUser(function(id, done) {
+          passport.deserializeUser((id, done) => {
             done(null, usr);
             });
 
           return done(null, usr);
-          break;
         } else {
           console.log("Incorrect Password");
           return done(null, false, {
             message: 'Incorrect Password'
           });
-          break;
         }
       }
-    }
+    });
     if (!userFound) {
       console.log("User Does Not Exist");
       return done(null, false, {
         message: 'Incorrect username.'
       });
     }
-    // Logic to query user and password from MySql is to be added here instead of the above code.
-    // I need a little time to get my head around MySql still.
+    // Logic to query user and password from MySql/ MongoDB is to be added here instead of the above code.
+
   }
 ));
 
